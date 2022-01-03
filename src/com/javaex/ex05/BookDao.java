@@ -1,4 +1,4 @@
-package com.javaex.ex02;
+package com.javaex.ex05;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,26 +8,16 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+public class BookDao {
 
-public class AuthorDao {
+	public BookDao() {
 
-	// 필드
-
-	// 생성자
-	public AuthorDao() { // 생략가능
 	}
 
-	// 메소드 gs
-
-	// 메소드 일반
-
-	// 작가 추가
-	public void authorInsert(String authorName, String authorDesc) {
-
+	public void bookInsert(String title, String pubs, String pubdate, int authorId) {
 		// 0. import java.sql.*;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
-		// ResultSet rs = null;
 
 		try {
 			// 1. JDBC 드라이버 (Oracle) 로딩
@@ -38,25 +28,24 @@ public class AuthorDao {
 			conn = DriverManager.getConnection(url, "webdb", "webdb");
 
 			// 3. SQL문 준비 / 바인딩 / 실행
-
-			// 문자열 만들기
 			String query = "";
-			query += " insert into author ";
-			query += " values(seq_author_id.nextval, ?, ? ) ";
-			System.out.println(query);
+			query += "insert into book";
+			query += " values(seq_book_id.nextval, ?, ?, ?, ?) ";
 
 			// 문자열 쿼리문으로 만들기
 			pstmt = conn.prepareStatement(query);
 
 			// 바인딩
-			pstmt.setString(1, authorName); // 첫번째 물음표의 데이터
-			pstmt.setString(2, authorDesc); // 두번째 물음표의 데이터
+			pstmt.setString(1, title); // title
+			pstmt.setString(2, pubs); // pubs
+			pstmt.setString(3, pubdate); // pub_date
+			pstmt.setInt(4, authorId); // author_id
 
 			// 실행
-			int count = pstmt.executeUpdate(); // 쿼리문 실행
+			int count = pstmt.executeUpdate();
 
 			// 4.결과처리
-			System.out.println(count + "건이 저장되었습니다.(작가)");
+			System.out.println(count + "건이 저장되었습니다. (책)");
 
 		} catch (ClassNotFoundException e) {
 			System.out.println("error: 드라이버 로딩 실패 - " + e);
@@ -66,9 +55,6 @@ public class AuthorDao {
 
 			// 5. 자원정리
 			try {
-				/*
-				 * if (rs != null) { rs.close(); }
-				 */
 				if (pstmt != null) {
 					pstmt.close();
 				}
@@ -78,18 +64,13 @@ public class AuthorDao {
 			} catch (SQLException e) {
 				System.out.println("error:" + e);
 			}
-
 		}
-
 	}
 
-	// 작가 삭제
-	public void authorDelete(int index) {
-
+	public void bookUpdate(String title, String pubs, String pubdate, int authorId, int bookId) {
 		// 0. import java.sql.*;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
-		// ResultSet rs = null;
 
 		try {
 			// 1. JDBC 드라이버 (Oracle) 로딩
@@ -100,23 +81,28 @@ public class AuthorDao {
 			conn = DriverManager.getConnection(url, "webdb", "webdb");
 
 			// 3. SQL문 준비 / 바인딩 / 실행
-			// 문자열 만들기
 			String query = "";
-			query += " delete from author ";
-			query += " where author_id = ? ";
-			System.out.println(query);
+			query += " update 	book ";
+			query += " set 		title= ?, ";
+			query += " 	   		pubs= ?, ";
+			query += " 	   		pub_date= ?, ";
+			query += " 	   		author_id= ? ";
+			query += " where	book_id= ? ";
 
 			// 문자열 쿼리문으로 만들기
 			pstmt = conn.prepareStatement(query);
 
 			// 바인딩
-			pstmt.setInt(1, index);
+			pstmt.setString(1, title);
+			pstmt.setString(2, pubs);
+			pstmt.setString(3, pubdate);
+			pstmt.setInt(4, authorId);
+			pstmt.setInt(5, bookId);
 
-			// 실행
 			int count = pstmt.executeUpdate();
 
 			// 4.결과처리
-			System.out.println(count + "건이 삭제되었습니다.(작가)");
+			System.out.println(count + "건이 수정되었습니다.");
 
 		} catch (ClassNotFoundException e) {
 			System.out.println("error: 드라이버 로딩 실패 - " + e);
@@ -126,9 +112,6 @@ public class AuthorDao {
 
 			// 5. 자원정리
 			try {
-				/*
-				 * if (rs != null) { rs.close(); }
-				 */
 				if (pstmt != null) {
 					pstmt.close();
 				}
@@ -138,18 +121,13 @@ public class AuthorDao {
 			} catch (SQLException e) {
 				System.out.println("error:" + e);
 			}
-
 		}
-
 	}
 
-	// 작가 수정
-	public void authorUpdate(int index, String authorName, String authorDesc) {
-
+	public void bookDelete(int bookId) {
 		// 0. import java.sql.*;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
-		// ResultSet rs = null;
 
 		try {
 			// 1. JDBC 드라이버 (Oracle) 로딩
@@ -160,27 +138,20 @@ public class AuthorDao {
 			conn = DriverManager.getConnection(url, "webdb", "webdb");
 
 			// 3. SQL문 준비 / 바인딩 / 실행
-			// 문자열 만들기
 			String query = "";
-			query += " update author ";
-			query += " set author_name = ?, ";
-			query += "     author_desc = ? ";
-			query += " where author_id = ? ";
-			System.out.println(query);
+			query += " delete from book ";
+			query += " where	   book_id= ? ";
 
-			// 문자열을 쿼리문으로 만들기
+			// 문자열 쿼리문으로 만들기
 			pstmt = conn.prepareStatement(query);
 
 			// 바인딩
-			pstmt.setString(1, authorName);
-			pstmt.setString(2, authorDesc);
-			pstmt.setInt(3, index);
+			pstmt.setInt(1, bookId);
 
-			// 실행
 			int count = pstmt.executeUpdate();
 
 			// 4.결과처리
-			System.out.println(count + "건이 수정되었습니다.(작가)");
+			System.out.println(count + "건이 삭제되었습니다.");
 
 		} catch (ClassNotFoundException e) {
 			System.out.println("error: 드라이버 로딩 실패 - " + e);
@@ -190,9 +161,6 @@ public class AuthorDao {
 
 			// 5. 자원정리
 			try {
-				/*
-				 * if (rs != null) { rs.close(); }
-				 */
 				if (pstmt != null) {
 					pstmt.close();
 				}
@@ -202,15 +170,13 @@ public class AuthorDao {
 			} catch (SQLException e) {
 				System.out.println("error:" + e);
 			}
-
 		}
-
 	}
 
-	// 작가 리스트 가져오기
-	public List<AuthorVo> authorSelect() {
-		List<AuthorVo> authorList = new ArrayList<AuthorVo>();
-		
+	public List<BookVo> bookSelect() {
+		List<BookVo> bookList = new ArrayList<BookVo>();
+
+		// SELECT - book
 		// 0. import java.sql.*;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -219,38 +185,47 @@ public class AuthorDao {
 		try {
 			// 1. JDBC 드라이버 (Oracle) 로딩
 			Class.forName("oracle.jdbc.driver.OracleDriver");
-			
+
 			// 2. Connection 얻어오기
 			String url = "jdbc:oracle:thin:@localhost:1521:xe";
 			conn = DriverManager.getConnection(url, "webdb", "webdb");
-			
+
 			// 3. SQL문 준비 / 바인딩 / 실행
-			  //문자열 만들기
-			String query ="";
-			query += " select  author_id, ";
-			query += "         author_name, ";
-			query += "         author_desc ";
-			query += " from author ";
-			System.out.println(query);
-			
-			//문자열 쿼리문으로 만들기
+			String query = "";
+			query += " select   book_id, ";
+			query += "          title, ";
+			query += "          pubs, ";
+			query += "          to_char(pub_date, 'YYYY-MM-DD') pubdate, ";
+			query += "          a.author_id id, ";
+			query += "          author_name, ";
+			query += "          author_desc ";
+			query += " from     book b, author a ";
+			query += " where    b.author_id= a.author_id ";
+			// System.out.println(query);
+
+			// 문자열 쿼리문으로 만들기
 			pstmt = conn.prepareStatement(query);
-			
-			//바인딩 -->생략  ?표 없음
-			
+
+			// 바인딩--> 생략 ( ? 없음)
+
+			// 실행
 			rs = pstmt.executeQuery();
-			
+
 			// 4.결과처리
-			while(rs.next()) {
-				int authorId= rs.getInt("author_id");    
+			while (rs.next()) {
+				int bookId = rs.getInt("book_id");
+				String title = rs.getString("title");
+				String pubs = rs.getString("pubs");
+				String pubdate = rs.getString("pubdate");
+				int authorId = rs.getInt("id");
 				String authorName = rs.getString("author_name");
 				String authorDesc = rs.getString("author_desc");
+				// System.out.println(bookId+", "+title+", "+pubs+", "+pub_date+", "+authorId+",
+				// "+authorName+", "+authordesc);
 
-				AuthorVo vo= new AuthorVo(authorId, authorName, authorDesc);
-				authorList.add(vo);
+				BookVo vo = new BookVo(bookId, title, pubs, pubdate, authorId, authorName, authorDesc);
+				bookList.add(vo);
 			}
-			
-			
 
 		} catch (ClassNotFoundException e) {
 			System.out.println("error: 드라이버 로딩 실패 - " + e);
@@ -272,10 +247,7 @@ public class AuthorDao {
 			} catch (SQLException e) {
 				System.out.println("error:" + e);
 			}
-
 		}
-
-		return authorList;
+		return bookList;
 	}
-
 }
